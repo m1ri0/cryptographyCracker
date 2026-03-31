@@ -1,4 +1,3 @@
-import uvicorn
 from typing import Dict
 from hashlib import md5, sha256
 from fastapi import FastAPI, HTTPException
@@ -12,7 +11,7 @@ class PassInput(BaseModel):
     password: str
     algorithm: str = "md5"
 
-@app.post("/genhash")
+@app.post("/gen-hash")
 def generate_hash(input: PassInput):
     if input.algorithm == "md5":
         hash = md5(input.password.encode()).hexdigest()
