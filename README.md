@@ -5,3 +5,4 @@ Vamos usar:
 - Docker
 - Celery
 - FastAPI
+- SQLite
