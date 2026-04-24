@@ -1,7 +1,7 @@
 from celery import group
 from celery.app.control import Control
 from app.celery import celery_app
-from .database import get_session
+from .db import get_session
 from app.models import CrackJob, JobStatus
 import hashlib
 

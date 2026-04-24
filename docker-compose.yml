@@ -1,9 +1,8 @@
 services:
   db: 
     image: postgres:latest
-    container_name: criptographyCracker_db
-    env_file:
-      - ./.env
+    container_name: cryptocracker_db
+    env_file: ./.env
     volumes:
       - cracker_db:/var/lib/postgresql/data
       - .config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
@@ -15,6 +14,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    
+  api:
+    build: .
+    container_name: cryptocracker_api
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file: ./app.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healty
+
+  broker:
+    image: rabbitmq:4-management
+    container_name: cryptocracker_broker
+    ports:
+      - "15672:15672"
+  
+  worker:
+    build: .
+    container_name: cryptocracker_worker
+    command: poetry run celery -A app.celery_app worker -Q crack --loglevel=info
+    env_file: ./app.env
+    depends_on:
+      - broker
+      - db
+    deploy:
+      replicas: 4
 
 volumes:
   cracker_db:
