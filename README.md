@@ -1,8 +1,9 @@
 # Cryptography Cracker
 
 Vamos usar:
-- Python
-- Docker
-- Celery
-- FastAPI
-- SQLite
+1. Python
+    - SQLAlchemy
+    - Celery (Redis)
+    - FastAPI
+2. Docker
+3. PostgresSQL
