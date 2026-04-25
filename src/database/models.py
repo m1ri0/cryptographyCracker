@@ -1,5 +1,14 @@
-from .db import Base
+import enum
+from enum import Enum
 from sqlalchemy import Column, Integer, String
+
+from .db import Base
+
+class StatusEnum(Enum):
+    PENDING = 'pending'
+    PROCESSING = 'processing'
+    FOUND = 'found'
+    EXHAUSTED = 'exhausted'
 
 class Password(Base):
     __tablename__ = 'password'
@@ -12,11 +21,17 @@ class Password(Base):
     )
 
     password = Column(
-        String(31),
-        nullable=False
+        String(32),
+        nullable=True
     )
 
     hashed_password = Column(
         String(255),
         nullable=False
+    )
+
+    status = Column(
+        String(20),
+        nullable=False,
+        default=StatusEnum.PENDING.value
     )

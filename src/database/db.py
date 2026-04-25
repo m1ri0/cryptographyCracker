@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 class Database():
     def __init__(self, settings: Settings):
         self.engine = create_async_engine(
-            f"postgresql://{settings.db_user}:{settings.db_password}@{settings.db_host}/{settings.db_name}"
+            f"{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}/{settings.db_name}"
         )
 
         self.session_maker = async_sessionmaker(
