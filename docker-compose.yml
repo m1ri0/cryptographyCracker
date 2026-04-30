@@ -1,13 +1,44 @@
 services:
 
   api:
-    
+    build: src/.
+    container_name: cripto-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db
+      - broker
 
   db:
-
+    image: postgres
+    container_name: cripto-db
+    restart: unless-stopped
+    env_file:
+      - src/database/.env
+    volumes:
+      - cripto_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   broker:
-
+    image: redis:7-alpine
+    container_name: cripto-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   worker:
     
+
+volumes:
+  cripto_db_data:
