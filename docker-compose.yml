@@ -6,13 +6,13 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
-    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: poetry run python3 main.py
     depends_on:
       - db
-      - broker
+      - redis
 
   db:
-    image: postgres
+    image: postgres:18-alpine
     container_name: cripto-db
     restart: unless-stopped
     environment:
@@ -21,14 +21,14 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_HOST_AUTH_METHOD=${DB_HOST_AUTH_METHOD}
     volumes:
-      - cripto_db_data:/var/lib/postgresql/data
+      - cripto_db_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  broker:
+  redis:
     image: redis:7-alpine
     container_name: cripto-redis
     restart: unless-stopped
@@ -44,10 +44,10 @@ services:
     build: src/.
     container_name: cripto-worker
     restart: unless-stopped
-    command: poetry run celery -A tasks worker --loglevel=info -c 8
+    command: poetry run celery -A backend.tasks worker --loglevel=info -c 8
     depends_on:
       - db
-      - broker
+      - redis
 
 volumes:
   cripto_db_data:
