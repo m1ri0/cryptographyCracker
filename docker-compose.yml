@@ -15,8 +15,11 @@ services:
     image: postgres
     container_name: cripto-db
     restart: unless-stopped
-    env_file:
-      - src/database/.env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST_AUTH_METHOD=${DB_HOST_AUTH_METHOD}
     volumes:
       - cripto_db_data:/var/lib/postgresql/data
     healthcheck:

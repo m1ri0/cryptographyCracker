@@ -6,13 +6,20 @@ class Base(DeclarativeBase):
     pass
 
 class Settings(BaseSettings):
+    DB_USER: str = "bruteforce"
+    DB_PASSWORD: str = "secret"
+    DB_HOST: str = "db"
+    DB_NAME: str = "hashcracker"
+    DB_PORT: str = "5432"
+    DB_DRIVER: str = "postgresql+asyncpg"
+
     class config:
-        env_file = "postgresql.env"
+        env_file = ".env"
 
 class Database():
     def __init__(self, settings: Settings):
         self.engine = create_async_engine(
-            f"{settings.db_driver}://{settings.db_user}:{settings.db_password}@{settings.db_host}/{settings.db_name}"
+            f"{settings.DB_DRIVER}://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}/{settings.DB_NAME}?port={settings.DB_PORT}"
         )
 
         self.session_maker = async_sessionmaker(
