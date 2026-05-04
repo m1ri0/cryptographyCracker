@@ -3,7 +3,6 @@ import hashlib
 import redis
 from celery import Celery
 from celery import group
-from sqlalchemy.future import select
 from sqlalchemy import update
 
 from database import Database, Settings, PasswordModel, StatusEnum
