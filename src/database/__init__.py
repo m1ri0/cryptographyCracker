@@ -1,6 +1,6 @@
 from .db import Base, Database, Settings
-from .models import Password as PasswordModel, StatusEnum
-from .schemas import PasswordRead, PasswordCreate
+from .models import PasswordModel, StatusEnum
+from .mapper import PasswordMapper
 
 __all__ = [
     "Base",
@@ -8,6 +8,5 @@ __all__ = [
     "Settings",
     "PasswordModel",
     "StatusEnum",
-    "PasswordRead",
-    "PasswordCreate"
+    "PasswordMapper"
 ]

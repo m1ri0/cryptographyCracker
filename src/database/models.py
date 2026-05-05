@@ -9,7 +9,7 @@ class StatusEnum(Enum):
     FOUND = 'found'
     EXHAUSTED = 'exhausted'
 
-class Password(Base):
+class PasswordModel(Base):
     __tablename__ = 'password'
 
     id = Column(
