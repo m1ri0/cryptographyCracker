@@ -1,10 +1,11 @@
+import hashlib
 from typing import Dict
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 
 from database import Database, Settings, PasswordModel, PasswordMapper
 
-router = APIRouter(prefix="cripto_crack", tags=["API Endpoints"])
+router = APIRouter(prefix="/cripto_crack", tags=["API Endpoints"])
 
 @router.get("/all-hashes")
 async def getAllHashes(session = Depends(Database(Settings()).getSession)) -> Dict:
@@ -29,9 +30,11 @@ async def getHashById(hash_id: int, session = Depends(Database(Settings()).getSe
     id, password, hash, status = hash_data
     return PasswordMapper.to_dict(PasswordModel(id=id, password=password, hashed_password=hash, status=status))
 
-@router.post("/add-hash")
-async def addHash(hash: str, session = Depends(Database(Settings()).getSession)) -> Dict:
-    new_password = PasswordModel(hashed_password=hash)
+@router.post("/add-password")
+async def addPassword(password: str, session = Depends(Database(Settings()).getSession)) -> Dict:
+    hashed_password = hashlib.md5(password.encode()).hexdigest()
+
+    new_password = PasswordModel(hashed_password=hashed_password)
 
     session.add(new_password)
     await session.commit()
