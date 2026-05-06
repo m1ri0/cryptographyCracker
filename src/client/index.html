@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        
+        <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    </head>
+    <header>
+        <div class="header-items">
+            <img class="header-img" src="{{ url_for('static', path='images/Logo_header.png') }}" class="logo">
+        </div>
+    </header>
+    <body>
+        <main>
+            <div class="top_section">
+                <img class="main" src="{{ url_for('static', path='images/Logo.png') }}">
+                <h1>Cripto Cracker Dashboard</h1>
+            </div>
+            <div class="list_section">
+                <div id="hashes-list-container"></div>
+            </div>
+            
+    </main>
+</body>
+</html>
+
+<script src="{{ url_for('static', path='js/jquery-4.0.0.min.js') }}"></script>
+<script src="{{ url_for('static', path='js/api.js') }}"></script>
+
+<!-- <div class="endpoint-container" onclick="fetchAllHashes()">
+    <span class="status">PENDING</span>
+    <span class="hash">hash especifica</span>
+    <span class="description">getallhashes</span>
+</div> -->

@@ -1,7 +1,10 @@
 import hashlib
 from typing import Dict
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 from database import Database, Settings, PasswordModel, PasswordMapper
 from backend.tasks import dispatchBruteForce 

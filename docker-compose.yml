@@ -4,6 +4,8 @@ services:
     build: src/.
     container_name: cripto-api
     restart: unless-stopped
+    volumes:
+      - ./src:/app
     ports:
       - "8000:8000"
     command: poetry run python3 main.py
@@ -44,6 +46,8 @@ services:
     build: src/.
     container_name: cripto-worker
     restart: unless-stopped
+    volumes:
+      - ./src:/app
     command: poetry run celery -A backend.tasks worker --loglevel=info -c 8
     depends_on:
       - db
