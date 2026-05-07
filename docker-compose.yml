@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./src:/app
-    command: poetry run celery -A backend.tasks worker --loglevel=info -c 8
+    command: poetry run celery -A backend.tasks worker --queues=celery,job_0,job_1,job_2,job_3,job_4 --concurrency=8 --loglevel=info
     depends_on:
       - db
       - redis

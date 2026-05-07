@@ -25,6 +25,8 @@ redis_client = redis.Redis(host='redis', port=6379, db=1, decode_responses=True)
 
 db = Database(Settings())
 
+ACTIVE_QUEUES_KEY = "active_job_queues"
+
 def getDatabaseSession():
     return db.getSession()
 
@@ -62,6 +64,32 @@ def cancelGroup(group_id: str, job_id: int):
         return f"Group {group_id} cancelled successfully."
     except Exception as e:
         return f"Error cancelling group {group_id}: {str(e)}"
+
+def shuffleQueue(queue_name: str = "celery"):
+    with redis_client.pipeline() as pipe:
+        while True:
+            try:
+                pipe.watch(queue_name)
+                tasks = pipe.lrange(queue_name, 0, -1)
+
+                if not tasks:
+                    pipe.reset()
+                    return
+                
+                tasks = list(tasks)
+                random.shuffle(tasks)
+
+                pipe.multi()
+                pipe.delete(queue_name)
+                pipe.rpush(queue_name, *tasks)
+                pipe.execute()
+                break
+
+            except Exception as e:
+                print(f"Error shuffling queue: {e}")
+                time.sleep(1)
+                continue
+
 
 @celery_app.task
 def finalizeJob(results: list, job_id: int):
@@ -137,6 +165,7 @@ def dispatchBruteForce(
     wordlist_path: str,
     lines_per_chunk: int = 50_000
 ):
+    queue_name = f"job_{job_id%5}"
     redis_client.delete(f"job_cracked_{job_id}")
     redis_client.delete(f"tasks_for_job_{job_id}")
 
@@ -153,8 +182,7 @@ def dispatchBruteForce(
 
     markJobAsProcessing(job_id)
 
-    result = chord(tasks)(finalizeJob.s(job_id=job_id))
-
+    result = chord(tasks)(finalizeJob.s(job_id=job_id), queue=queue_name)
     redis_client.set(f"group_id_{job_id}", result.id, ex=86400)
 
     return f"Work {job_id} dispatched with {len(tasks)} chunks and sent to Redis"

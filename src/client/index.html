@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="{{ url_for('static', path='images/Logo.png') }}">
         <title>{{ title }}</title>
         
         <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
@@ -19,7 +20,10 @@
                 <h1>Cripto Cracker Dashboard</h1>
             </div>
             <div class="list_section">
-                <h2 class="list-title">Hash List</h2>
+                <div class="title_and_btn">
+                    <h2 class="list-title">Lista de Hashes</h2>
+                    <button id="add-pass-btn" class="btn-add">Adicionar Senha</button>
+                </div>
                 <div id="hashes-list-container"></div>
             </div>
             

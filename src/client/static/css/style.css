@@ -167,6 +167,32 @@ img.main {
     margin-bottom: 20px;
 }
 
+.title_and_btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.btn-add {
+  margin-right: 75px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  background-color: #00bf63;
+  color: #111;
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-add:hover {
+  background-color: white;
+  color: #00bf63;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 .endpoint-wrapper {
     margin-bottom: 10px;
 }
@@ -380,6 +406,96 @@ img.main {
     border: 1px solid #ddd;
     background: white;
     border-radius: 4px;
+}
+
+/*  Modal   */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+}
+
+.modal-content {
+  background-color: transparent;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: white;
+  font-family: 'League Spartan', sans-serif;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions .btn-action {
+  padding: 8px;
+  cursor: pointer;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  background-color: #00bf63;
+  color: #111;
+  border: none;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.btn-action:hover {
+  background-color: white;
+  color: #00bf63;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.password-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-overlay.hide {
+  animation: fadeIn 0.3s ease forwards reverse;
+}
+
+.modal-overlay.hide .modal-content {
+  animation: modalIn 0.3s ease forwards reverse;
+}
+
+.modal-overlay {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.modal-content {
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /*  Responsive Design   */

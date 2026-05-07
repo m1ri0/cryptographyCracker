@@ -71,6 +71,16 @@ async function fetchAllHashes() {
     }
 };
 
+function closeModal() {
+    const modal = $('#modal-overlay');
+
+    modal.addClass('hide');
+
+    setTimeout(() => {
+        modal.remove();
+    }, 300);
+}
+
 $(document).ready(async function() {
     const result = await fetchAllHashes();
     createHashListContainer(result);
@@ -113,6 +123,62 @@ $(document).ready(async function() {
         }
         catch (error) {
             console.error("Error starting crack process:", error);
+        }
+    });
+
+    $('#add-pass-btn').on('click', function() {
+        const modalHtml = `
+            <div id="modal-overlay" class="modal-overlay">
+                <div class="modal-content">
+                    <h3>Inserir senha para gerar hash</h3>
+                    <input type="password" id="password-input" placeholder="Digite a senha..." class="password-input">
+                    <div class="modal-actions">
+                        <button id="save-pass-btn" class="btn-action">Salvar</button>
+                        <button id="close-modal-btn" class="btn-action">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('body').append(modalHtml);
+    });
+
+    $('body').on('click', '#close-modal-btn', function() {
+        closeModal();
+    });
+
+    $('body').on('click', '#modal-overlay', function(event) {
+        if (event.target === this) {
+            closeModal();
+        }
+    });
+
+    $('body').on('click', '#save-pass-btn', async function() {
+        const password = $('#password-input').val().trim();
+        if (!password) {
+            alert("Por favor, insira uma senha válida.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/cripto_crack/add-hash', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+
+            if (!response.ok) throw new Error("Erro ao adicionar a senha");
+
+            const data = await response.json();
+            console.log("Senha adicionada com sucesso:", data);
+
+            const allHashes = await fetchAllHashes();
+            createHashListContainer(allHashes);
+        }
+        catch (error) {
+            console.error("Error adding password:", error);
+        }
+        finally {
+            $('#modal-overlay').remove();
         }
     });
 });
