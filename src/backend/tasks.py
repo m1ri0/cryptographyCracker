@@ -1,7 +1,8 @@
+import random
 import time
 import hashlib
 import redis
-from celery import Celery, group
+from celery import Celery, group, chord
 from sqlalchemy import update
 from celery.result import GroupResult
 
@@ -22,11 +23,22 @@ celery_app.conf.update(
 
 redis_client = redis.Redis(host='redis', port=6379, db=1, decode_responses=True)
 
-def markJobAsFound(job_id: int, cracked_pass: str):
-    settings = Settings()
-    db = Database(settings)
+db = Database(Settings())
 
-    with db.getSession() as session:
+def getDatabaseSession():
+    return db.getSession()
+
+def markJobAsProcessing(job_id: int):
+    with getDatabaseSession() as session:
+        session.execute(
+            update(PasswordModel)
+            .where(PasswordModel.id == job_id)
+            .values(status=StatusEnum.PROCESSING.value)
+        )
+        session.commit()
+
+def markJobAsFound(job_id: int, cracked_pass: str):
+    with getDatabaseSession() as session:
         session.execute(
             update(PasswordModel)
             .where(PasswordModel.id == job_id)
@@ -34,14 +46,34 @@ def markJobAsFound(job_id: int, cracked_pass: str):
         )
         session.commit()
 
+def markJobAsExhausted(job_id: int):
+    with getDatabaseSession() as session:
+        session.execute(
+            update(PasswordModel)
+            .where(PasswordModel.id == job_id)
+            .values(status=StatusEnum.EXHAUSTED.value)
+        )
+        session.commit()
+
 def cancelGroup(group_id: str, job_id: int):
-    saved_group = GroupResult.restore(group_id, app=celery_app)
-    if saved_group:
-        saved_group.revoke(terminate=True, signal='SIGKILL')
+    try:
+        celery_app.control.revoke(group_id, terminate=True, signal='SIGKILL')
         redis_client.delete(f"tasks_for_job_{job_id}")
         return f"Group {group_id} cancelled successfully."
-    else:
-        return f"No group found with id: {group_id}"
+    except Exception as e:
+        return f"Error cancelling group {group_id}: {str(e)}"
+
+@celery_app.task
+def finalizeJob(results: list, job_id: int):
+    flag_key = f"job_cracked_{job_id}"
+    
+    if not redis_client.get(flag_key):
+        markJobAsExhausted(job_id)
+        return f"Job {job_id} exhausted. No password found."
+
+    redis_client.delete(flag_key)
+    redis_client.delete(f"group_id_{job_id}")
+    redis_client.delete(f"tasks_for_job_{job_id}")
 
 @celery_app.task
 def processWordListChunck(
@@ -93,7 +125,7 @@ def processWordListChunck(
                         print(f"CRITICAL: Dont is possible, group_id should be in Redis for job_id {job_id}")
 
                     return f"Hash cracked! {word}"
-                
+        
         return f"Chunk processed, {start}-{end}. Hash not found: {job_id}"
     except FileNotFoundError:
         return f"Wordlist file not found: {wordlist_path}"
@@ -119,9 +151,9 @@ def dispatchBruteForce(
         end = min(start + lines_per_chunk, total_lines)
         tasks.append(processWordListChunck.s(job_id, target_hash, wordlist_path, start, end))
 
-    job_group = group(tasks)
-    result = job_group.apply_async()
-    result.save()
+    markJobAsProcessing(job_id)
+
+    result = chord(tasks)(finalizeJob.s(job_id=job_id))
 
     redis_client.set(f"group_id_{job_id}", result.id, ex=86400)
 

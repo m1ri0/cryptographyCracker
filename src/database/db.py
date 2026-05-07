@@ -43,10 +43,10 @@ class Database():
         )
 
     def getAsyncSession(self) -> AsyncSession:
-        return self.async_session_maker()
+        return self.async_session_maker.begin()
     
     def getSession(self):
-        return self.session_maker()
+        return self.session_maker.begin()
     
     async def createTables(self):
         async with self.async_engine.begin() as conn:

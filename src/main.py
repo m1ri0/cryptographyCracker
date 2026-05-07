@@ -19,6 +19,7 @@ async def lifespan(app: FastAPI):
     yield
 
     await app.state.db.engine.dispose()
+    await app.state.db.async_engine.dispose()
 
 app = FastAPI(lifespan=lifespan, title="Cripto Cracker API")
 

@@ -2,18 +2,15 @@ import hashlib
 from typing import Dict
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 
-from database import Database, Settings, PasswordModel, PasswordMapper
+from database import PasswordModel, PasswordMapper
 from backend.tasks import dispatchBruteForce 
 
 router = APIRouter(prefix="/cripto_crack", tags=["API Endpoints"])
 
-async def get_db():
-    async with Database(Settings()).getAsyncSession() as session:
-        yield session
+async def get_db(request: Request):
+    async with request.app.state.db.getAsyncSession() as session:
+            yield session
 
 @router.get("/all-hashes")
 async def getAllHashes(session = Depends(get_db)) -> Dict:
@@ -45,7 +42,7 @@ async def addPassword(password: str, session = Depends(get_db)) -> Dict:
     new_password = PasswordModel(hashed_password=hashed_password)
 
     session.add(new_password)
-    await session.commit()
+    await session.flush()
     await session.refresh(new_password)
 
     return PasswordMapper.to_dict(new_password)
