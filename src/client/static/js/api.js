@@ -19,6 +19,10 @@ function createHashElement(hashData) {
 }
 
 function createHashDetailsElement(detailsData) {
+    const btnCrack = detailsData.status === 'pending'
+        ? `<button class="btn-crack" data-id="${detailsData.id}">Crack</button>`
+        : '';
+
     return `
         <div class="details-content">
             <div class="detail-row detail-row-${detailsData.status}">
@@ -34,6 +38,9 @@ function createHashDetailsElement(detailsData) {
             <div class="detail-row detail-row-${detailsData.status} highlight">
                 <strong>Senha Descoberta:</strong> <span class="pass-text">${detailsData.password}</span>
             </div>` : ''}
+            <div class="detail-actions">
+                ${btnCrack}
+            </div>
         </div>
     `;
 }
@@ -89,6 +96,23 @@ $(document).ready(async function() {
         }
         catch (error) {
             console.error("Error fetching hash details:", error);
+        }
+    });
+
+    $('#hashes-list-container').on('click', '.btn-crack', async function(event) {
+        event.stopPropagation();
+
+        const HashId = $(this).data('id');
+
+        try {
+            const response = await fetch(`/cripto_crack/crack/${HashId}`, { method: 'POST' });
+            if (!response.ok) throw new Error("Erro ao iniciar o processo de cracking");
+
+            const data = await response.json();
+            console.log("Crack process started:", data);
+        }
+        catch (error) {
+            console.error("Error starting crack process:", error);
         }
     });
 });
