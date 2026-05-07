@@ -10,8 +10,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
   color: #000;
-  background-color: #fff;
+  background-color: #272822;
   margin-top: 100px;
+  padding-bottom: 60px;
 }
 
 main {
@@ -19,7 +20,7 @@ main {
     justify-content: center;
     max-width: 100%;
     flex-direction: column;
-    background-color: #333;
+    background-color: #272822;
 }
 
 /*  Textos   */
@@ -100,6 +101,7 @@ header {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    box-shadow: 5px 5px 3rem 50px black;
 }
 
 img.main {
@@ -108,94 +110,246 @@ img.main {
     object-fit: contain;
 }
 
+.list_section {
+  margin-top: 70px;
+}
+
+.main-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #2b2b2b;
+    color: #eee;
+    border-top: 2px solid black;
+    padding: 10px 0;
+    z-index: 9999;
+    font-family: 'League Spartan', sans-serif;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.footer-logo {
+    height: 40px;
+    filter: grayscale(100%) brightness(1.5);
+}
+
+.footer-center p {
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.footer-right span {
+    font-size: 0.9em;
+}
+
+.footer-right strong {
+    color: white; 
+}
+
 /*  Content   */
+
+.list-title {
+    color: #00bf63;
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 600;
+    text-shadow: 0.3rem 0.3rem 0.3rem rgba(0, 0, 0, 0.5);
+    margin-left: 75px;
+    margin-bottom: 20px;
+    margin-right: 50rem;
+    word-break: unset;
+}
 
 .endpoint-wrapper {
     margin-bottom: 10px;
 }
 
 .endpoint-container {
-    background-color: #555;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
-    margin-left: 10em;
-    margin-right: 10em;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  background-color: #444;
+  border-radius: 10px;
+  margin-top: 1rem;
+  margin-left: 75px;
+  margin-right: 75px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid black;
+  height: 2.3rem;
 }
 
 .endpoint-container:hover {
-    background-color: #00bf63;
+  background-color: #00bf63;
+  box-shadow: #000 0px 0px 10px, #000 0px 0px 20px, #000 0px 0px 30px;
+}
+
+.endpoint-container.active {
+  border-radius: 10px 10px 0 0;
+}
+
+.endpoint-pending {
+  border-color: #d4ba25;
+}
+
+.endpoint-processing {
+  border-color: #df6800;
+}
+
+.endpoint-found {
+  border-color: #7bbafd;
+}
+
+.endpoint-exhausted {
+  border-color: #ba0000;
 }
 
 .hash-details {
-    background-color: #272822; /* Cor de fundo escura tipo terminal */
+    background-color: #272822;
     color: #f8f8f2;
-    padding: 15px;
-    border: 1px solid #4990e2;
-    border-top: none; /* Remove a borda superior para colar na barra */
-    border-radius: 0 0 4px 4px; /* Arredonda apenas os cantos inferiores */
+    padding: 10px;
+    margin-left: 75px;
+    margin-right: 75px;
+    border: 1px solid black;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
     font-family: monospace;
-    overflow-x: auto; /* Adiciona barra de rolagem se o JSON for muito largo */
+    overflow-x: auto;
+}
+
+.hash-details-pending {
+  border-color: #d4ba25;
+}
+
+.hash-details-processing {
+  border-color: #df6800;
+}
+
+.hash-details-found {
+  border-color: #7bbafd;
+}
+
+.hash-details-exhausted {
+  border-color: #ba0000;
+}
+
+.detail-row {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #444;
+  padding-bottom: 4px;
+}
+
+.detail-row-pending strong {
+  color: #d4ba25;
+}
+
+.detail-row-processing strong {
+  color: #df6800;
+}
+
+.detail-row-found strong {
+  color: #008cd7;
+}
+
+.detail-row-exhausted strong {
+  color: #ba0000;
+}
+
+.detail-row.highlight {
+  background-color: rgba(0, 140, 215, 0.1);
+  padding: 10px;
+  border: 1px solid #008cd7;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.hash-text {
+  font-family: monospace;
+  word-break: break-all;
+  margin-left: 10px;
+}
+
+.pass-text {
+  font-weight: bold;
+  color: #52fa7c;
+  font-size: 1.1em;
 }
 
 .pending {
     background-color: #d4ba25;
     color: white;
     font-weight: bold;
-    padding: 6px 15px;
+    padding: 2px 15px;
     border-radius: 3px;
-    margin-right: 15px;
-    min-width: 50px;
-    text-align: center;
+    margin-right: 15px;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    line-height: 1;
+    text-transform: lowercase;
 }
 
 .processing {
     background-color: #df6800;
     color: white;
     font-weight: bold;
-    padding: 6px 15px;
+    padding: 2px 15px;
     border-radius: 3px;
-    margin-right: 15px;
-    min-width: 50px;
-    text-align: center;
+    margin-right: 15px;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    line-height: 1;
+    text-transform: lowercase;
 }
 
 .found {
     background-color: #008cd7;
     color: white;
     font-weight: bold;
-    padding: 6px 15px;
+    padding: 2px 15px;
     border-radius: 3px;
-    margin-right: 15px;
-    min-width: 50px;
-    text-align: center;
+    margin-right: 15px;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.2rem;
+    line-height: 1;
+    text-transform: lowercase;
 }
 
-.exhausted {
+.exhausteda {
     background-color: #ba0000;
     color: white;
     font-weight: bold;
-    padding: 6px 15px;
+    padding: 2px 15px;
     border-radius: 3px;
-    margin-right: 15px;
-    min-width: 50px;
-    text-align: center;
+    margin-right: 15px;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    line-height: 1;
+    text-transform: lowercase;
 }
 
 .hash {
     font-family: 'League Spartan', monospace;
     font-weight: 400;
     font-size: 1.2em;
-}
-
-.description {
-    color: #555;
-    font-size: 0.9em;
 }
 
 #results {

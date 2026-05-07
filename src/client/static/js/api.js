@@ -3,7 +3,7 @@ function createHashElement(hashData) {
 
     return `
         <div class="endpoint-wrapper" style="margin-bottom: 10px;">
-            <div class="endpoint-container" data-id="${hashData.id}">
+            <div class="endpoint-container endpoint-${hashData.status}" data-id="${hashData.id}">
                 <span class="${hashData.status}">
                     ${hashData.status}
                 </span>
@@ -12,9 +12,28 @@ function createHashElement(hashData) {
                 </span>
             </div>
 
-            <div class="hash-details" id="details-${hashData.id}" style="display: none;">
-                <em>Buscando detalhes...</em>
+            <div class="hash-details hash-details-${hashData.status}" id="details-${hashData.id}" style="display: none;">
             </div>
+        </div>
+    `;
+}
+
+function createHashDetailsElement(detailsData) {
+    return `
+        <div class="details-content">
+            <div class="detail-row detail-row-${detailsData.status}">
+                <strong>ID:</strong> <span>${detailsData.id}</span>
+            </div>
+            <div class="detail-row detail-row-${detailsData.status}">
+                <strong>Hash Original:</strong> <span class="hash-text">${detailsData.hash}</span>
+            </div>
+            <div class="detail-row detail-row-${detailsData.status}">
+                <strong>Status:</strong> <span class="status-badge ${detailsData.status}">${detailsData.status}</span>
+            </div>
+            ${detailsData.password ? `
+            <div class="detail-row detail-row-${detailsData.status} highlight">
+                <strong>Senha Descoberta:</strong> <span class="pass-text">${detailsData.password}</span>
+            </div>` : ''}
         </div>
     `;
 }
@@ -50,6 +69,7 @@ $(document).ready(async function() {
     createHashListContainer(result);
 
     $('#hashes-list-container').on('click', '.endpoint-container', async function() {
+        $(this).toggleClass('active');
         const hashId = $(this).data('id');
         const detailsDiv = $(`#details-${hashId}`);
 
@@ -63,7 +83,7 @@ $(document).ready(async function() {
 
             const data = await response.json();
 
-            detailsDiv.html(`<pre>${JSON.stringify(data, null, 2)}</pre>`);
+            detailsDiv.html(createHashDetailsElement(data));
             
             detailsDiv.data('loaded', true);
         }

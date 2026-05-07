@@ -11,8 +11,12 @@ from backend.tasks import dispatchBruteForce
 
 router = APIRouter(prefix="/cripto_crack", tags=["API Endpoints"])
 
+async def get_db():
+    async with Database(Settings()).getAsyncSession() as session:
+        yield session
+
 @router.get("/all-hashes")
-async def getAllHashes(session = Depends(Database(Settings()).getAsyncSession)) -> Dict:
+async def getAllHashes(session = Depends(get_db)) -> Dict:
     result = await session.execute(
         select(PasswordModel.id, PasswordModel.password, PasswordModel.hashed_password, PasswordModel.status)
     )
@@ -21,7 +25,7 @@ async def getAllHashes(session = Depends(Database(Settings()).getAsyncSession)) 
     return {"hashes": [PasswordMapper.to_dict(password) for password in hashes] }
 
 @router.get("/hash/{hash_id}")
-async def getHashById(hash_id: int, session = Depends(Database(Settings()).getAsyncSession)) -> Dict:
+async def getHashById(hash_id: int, session = Depends(get_db)) -> Dict:
     result = await session.execute(
         select(PasswordModel.id, PasswordModel.password, PasswordModel.hashed_password, PasswordModel.status)
         .where(PasswordModel.id == hash_id)
@@ -35,7 +39,7 @@ async def getHashById(hash_id: int, session = Depends(Database(Settings()).getAs
     return PasswordMapper.to_dict(PasswordModel(id=id, password=password, hashed_password=hash, status=status))
 
 @router.post("/add-password")
-async def addPassword(password: str, session = Depends(Database(Settings()).getAsyncSession)) -> Dict:
+async def addPassword(password: str, session = Depends(get_db)) -> Dict:
     hashed_password = hashlib.md5(password.encode()).hexdigest()
 
     new_password = PasswordModel(hashed_password=hashed_password)
@@ -47,7 +51,7 @@ async def addPassword(password: str, session = Depends(Database(Settings()).getA
     return PasswordMapper.to_dict(new_password)
 
 @router.post("/crack/{hash_id}")
-async def crackPassword(hash_id: int, session = Depends(Database(Settings()).getAsyncSession)) -> Dict:
+async def crackPassword(hash_id: int, session = Depends(get_db)) -> Dict:
     search_result = await session.execute(
         select(PasswordModel)
         .where(PasswordModel.id == hash_id)

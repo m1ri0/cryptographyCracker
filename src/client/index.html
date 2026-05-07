@@ -19,18 +19,28 @@
                 <h1>Cripto Cracker Dashboard</h1>
             </div>
             <div class="list_section">
+                <h2 class="list-title">Hash List</h2>
                 <div id="hashes-list-container"></div>
             </div>
             
-    </main>
-</body>
+        </main>
+    </body>
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <img src="{{ url_for('static', path='images/Logo.png') }}" alt="Logo" class="footer-logo">
+            </div>
+            
+            <div class="footer-center">
+                <p>© 2026 — Todos os direitos reservados.</p>
+            </div>
+
+            <div class="footer-right">
+                <span>Criado por: <strong>Mário Lúcio</strong></span>
+            </div>
+        </div>
+    </footer>
 </html>
 
 <script src="{{ url_for('static', path='js/jquery-4.0.0.min.js') }}"></script>
 <script src="{{ url_for('static', path='js/api.js') }}"></script>
-
-<!-- <div class="endpoint-container" onclick="fetchAllHashes()">
-    <span class="status">PENDING</span>
-    <span class="hash">hash especifica</span>
-    <span class="description">getallhashes</span>
-</div> -->

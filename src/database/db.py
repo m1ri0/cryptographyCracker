@@ -25,7 +25,10 @@ class Database():
         )
 
         self.async_engine = create_async_engine(
-            f"{settings.DB_ASYNC_DRIVER}://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}/{settings.DB_NAME}?port={settings.DB_PORT}"
+            f"{settings.DB_ASYNC_DRIVER}://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}/{settings.DB_NAME}?port={settings.DB_PORT}",
+            pool_size=20,
+            max_overflow=30,
+            pool_timeout=60
         )
 
         self.session_maker = sessionmaker(
