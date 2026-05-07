@@ -131,7 +131,7 @@ $(document).ready(async function() {
             <div id="modal-overlay" class="modal-overlay">
                 <div class="modal-content">
                     <h3>Inserir senha para gerar hash</h3>
-                    <input type="text" id="password-input" placeholder="Digite a senha..." class="password-input">
+                    <input type="password" id="password-input" placeholder="Digite a senha..." class="password-input">
                     <div class="modal-actions">
                         <button id="save-pass-btn" class="btn-action">Salvar</button>
                         <button id="close-modal-btn" class="btn-action">Cancelar</button>
