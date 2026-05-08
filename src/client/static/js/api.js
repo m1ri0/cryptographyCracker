@@ -81,9 +81,49 @@ function closeModal() {
     }, 300);
 }
 
+function updateHashUI(hashData) {
+    const container = $(`.endpoint-container[data-id="${hashData.id}"]`);
+
+    if (container.length === 0) {
+        $('#hashes-list-container').append(createHashElement(hashData));
+        return;
+    }
+
+    const statusSpan = container.find('span').first();
+    const currentStatus = statusSpan.text().trim();
+
+    if (currentStatus !== hashData.status) {
+        container.removeClass(`endpoint-${currentStatus}`).addClass(`endpoint-${hashData.status}`);
+        statusSpan.removeClass(currentStatus).addClass(hashData.status).text(hashData.status);
+
+        const value = hashData.password ? hashData.password : hashData.hash;
+        container.find('.hash').text(value);
+
+        const detailsDiv = $(`#details-${hashData.id}`);
+        detailsDiv.data('loaded', false);
+        detailsDiv.removeClass(`hash-details-${currentStatus}`).addClass(`hash-details-${hashData.status}`);
+
+        if (detailsDiv.is(':visible')) {
+            detailsDiv.html(createHashDetailsElement(hashData));
+        }
+    }
+}
+
+async function pollHashes() {
+    const data = await fetchAllHashes();
+
+    if (data && data.hashes) {
+        data.hashes.forEach(hashData => {
+            updateHashUI(hashData);
+        });
+    }
+}
+
 $(document).ready(async function() {
     const result = await fetchAllHashes();
     createHashListContainer(result);
+
+    setInterval(pollHashes, 3000);
 
     $('#hashes-list-container').on('click', '.endpoint-container', async function() {
         $(this).toggleClass('active');
