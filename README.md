@@ -8,3 +8,7 @@ Vamos usar:
     - FastAPI
 2. Docker
 3. PostgresSQL
+
+Rodar o código:
+`sudo docker compose up --build`
+use este comando na pasta principal do projeto
