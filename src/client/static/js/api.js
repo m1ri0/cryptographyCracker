@@ -52,6 +52,8 @@ function createHashListContainer(data) {
     data.hashes.forEach(item => {
         container.innerHTML += createHashElement(item);
     });
+
+    updateCrackAllButton(data.hashes);
 }
 
 async function fetchAllHashes() {
@@ -109,6 +111,17 @@ function updateHashUI(hashData) {
     }
 }
 
+function updateCrackAllButton(hashes) {
+    const pendingCount = hashes.filter(hashData => hashData.status === 'pending').length;
+    const crackAllButton = $('#crack-all-btn');
+
+    crackAllButton.prop('disabled', pendingCount === 0);
+    crackAllButton.text(pendingCount > 0
+        ? `Crackear Pendentes (${pendingCount})`
+        : 'Crackear Pendentes'
+    );
+}
+
 async function pollHashes() {
     const data = await fetchAllHashes();
 
@@ -116,6 +129,7 @@ async function pollHashes() {
         data.hashes.forEach(hashData => {
             updateHashUI(hashData);
         });
+        updateCrackAllButton(data.hashes);
     }
 }
 
@@ -163,6 +177,31 @@ $(document).ready(async function() {
         }
         catch (error) {
             console.error("Error starting crack process:", error);
+        }
+    });
+
+    $('#crack-all-btn').on('click', async function() {
+        const button = $(this);
+
+        button.prop('disabled', true).text('Enviando...');
+
+        try {
+            const response = await fetch('/cripto_crack/crack-pending', { method: 'POST' });
+            if (!response.ok) throw new Error("Erro ao iniciar o processo de cracking em lote");
+
+            const data = await response.json();
+            console.log("Batch crack process started:", data);
+
+            const allHashes = await fetchAllHashes();
+            createHashListContainer(allHashes);
+        }
+        catch (error) {
+            console.error("Error starting batch crack process:", error);
+            const allHashes = await fetchAllHashes();
+
+            if (allHashes && allHashes.hashes) {
+                updateCrackAllButton(allHashes.hashes);
+            }
         }
     });
 

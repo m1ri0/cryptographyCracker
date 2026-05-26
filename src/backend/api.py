@@ -3,10 +3,11 @@ from typing import Dict
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
 
-from database import PasswordModel, PasswordMapper
+from database import PasswordModel, PasswordMapper, Settings, StatusEnum
 from backend.tasks import dispatchBruteForce 
 
 router = APIRouter(prefix="/cripto_crack", tags=["API Endpoints"])
+settings = Settings()
 
 async def get_db(request: Request):
     async with request.app.state.db.getAsyncSession() as session:
@@ -59,8 +60,46 @@ async def crackPassword(hash_id: int, session = Depends(get_db)) -> Dict:
     if not password_entry:
         return {"error": "Hash not found"}
     
-    task = dispatchBruteForce.delay(job_id=password_entry.id, target_hash=password_entry.hashed_password, wordlist_path="./wordlists/Pwdb_top-10000000.txt")
+    task = dispatchBruteForce.delay(
+        job_id=password_entry.id,
+        target_hash=password_entry.hashed_password,
+        wordlist_paths=settings.WORDLIST_PATHS
+    )
 
     return {"message": "Task dispatched successfully",
             "task_id": task.id
+    }
+
+@router.post("/crack-pending")
+async def crackPendingPasswords(session = Depends(get_db)) -> Dict:
+    search_result = await session.execute(
+        select(PasswordModel)
+        .where(PasswordModel.status == StatusEnum.PENDING.value)
+    )
+
+    pending_passwords = search_result.scalars().all()
+
+    if not pending_passwords:
+        return {
+            "message": "No pending hashes found",
+            "dispatched": 0,
+            "tasks": []
+        }
+
+    tasks = []
+    for password_entry in pending_passwords:
+        task = dispatchBruteForce.delay(
+            job_id=password_entry.id,
+            target_hash=password_entry.hashed_password,
+            wordlist_paths=settings.WORDLIST_PATHS
+        )
+        tasks.append({
+            "hash_id": password_entry.id,
+            "task_id": task.id
+        })
+
+    return {
+        "message": "Pending crack tasks dispatched successfully",
+        "dispatched": len(tasks),
+        "tasks": tasks
     }

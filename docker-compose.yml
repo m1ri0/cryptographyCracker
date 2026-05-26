@@ -4,28 +4,36 @@ services:
     build: src/.
     container_name: cripto-api
     restart: unless-stopped
+    environment:
+      DB_USER: ${DB_USER:-bruteforce}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-hashcracker}
+      DB_PORT: ${DB_PORT:-5432}
+      WORDLIST_PATHS: ${WORDLIST_PATHS:-./wordlists/Pwdb_top-10000000.txt}
     volumes:
       - ./src:/app
     ports:
       - "8000:8000"
     command: poetry run python3 main.py
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   db:
     image: postgres:18-alpine
     container_name: cripto-db
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_HOST_AUTH_METHOD=${DB_HOST_AUTH_METHOD}
+      POSTGRES_USER: ${DB_USER:-bruteforce}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_DB: ${DB_NAME:-hashcracker}
     volumes:
       - cripto_db_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -46,12 +54,21 @@ services:
     build: src/.
     container_name: cripto-worker
     restart: unless-stopped
+    environment:
+      DB_USER: ${DB_USER:-bruteforce}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-hashcracker}
+      DB_PORT: ${DB_PORT:-5432}
+      WORDLIST_PATHS: ${WORDLIST_PATHS:-./wordlists/Pwdb_top-10000000.txt}
     volumes:
       - ./src:/app
     command: poetry run celery -A backend.tasks worker --queues=celery,job_0,job_1,job_2,job_3,job_4 --concurrency=8 --loglevel=info
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   cripto_db_data:

@@ -1,12 +1,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 class Base(DeclarativeBase):
     pass
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+
     DB_USER: str = "bruteforce"
     DB_PASSWORD: str = "secret"
     DB_HOST: str = "db"
@@ -14,9 +20,7 @@ class Settings(BaseSettings):
     DB_PORT: str = "5432"
     DB_ASYNC_DRIVER: str = "postgresql+asyncpg"
     DB_SYNC_DRIVER: str = "postgresql+psycopg2"
-
-    class config:
-        env_file = ".env"
+    WORDLIST_PATHS: str = "./wordlists/Pwdb_top-10000000.txt"
 
 class Database():
     def __init__(self, settings: Settings):
