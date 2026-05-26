@@ -108,6 +108,7 @@ header {
     background-position: center;
     background-repeat: no-repeat;
     box-shadow: 5px 5px 3rem 50px black;
+    box-sizing: border-box;
 }
 
 img.main {

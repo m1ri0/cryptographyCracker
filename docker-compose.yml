@@ -10,7 +10,7 @@ services:
       DB_HOST: db
       DB_NAME: ${DB_NAME:-hashcracker}
       DB_PORT: ${DB_PORT:-5432}
-      WORDLIST_PATHS: ${WORDLIST_PATHS:-./wordlists/Pwdb_top-10000000.txt}
+      WORDLIST_PATHS: ${WORDLIST_PATHS:-./wordlists}
     volumes:
       - ./src:/app
     ports:

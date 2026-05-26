@@ -7,12 +7,6 @@ class Base(DeclarativeBase):
     pass
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
-    )
-
     DB_USER: str = "bruteforce"
     DB_PASSWORD: str = "secret"
     DB_HOST: str = "db"
@@ -21,6 +15,9 @@ class Settings(BaseSettings):
     DB_ASYNC_DRIVER: str = "postgresql+asyncpg"
     DB_SYNC_DRIVER: str = "postgresql+psycopg2"
     WORDLIST_PATHS: str = "./wordlists/Pwdb_top-10000000.txt"
+
+    class config:
+        env_file = ".env"
 
 class Database():
     def __init__(self, settings: Settings):
