@@ -13,6 +13,8 @@ Rodar o código:
 `sudo docker compose up --build`
 use este comando na pasta principal do projeto
 
+Então abra no seu navegador `localhost:8000` e a interface da API estará disponível
+
 Wordlists:
 - Por padrao o projeto usa `./wordlists/Pwdb_top-10000000.txt` dentro do container.
 - Para usar varias wordlists em ordem, configure `WORDLIST_PATHS` com caminhos separados por virgula.
